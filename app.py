@@ -44,12 +44,13 @@ def home():
         return "Data added to database!"
 
     return render_template("index.html")
+
 #Route to handle sumisiion of room data
 @app.route("/submit", methods=["POST"])
 def submit_data():
     room_number = request.form.get("roomNumber")
     available = request.form.get("available")
-
+    #Ensure the info given is correct and not empty
     if room_number and available:
         try:
             new_entry = RoomData(room_number=room_number, available=available, checkcount=0)
@@ -62,7 +63,7 @@ def submit_data():
     else:
         return render_template("submit.html", success=False)
 
-#Route that handles the Wytr room's availablility
+#Route that handles the WYTR room's availablility
 @app.route("/wyly-room")
 def wyly_room():
     # Filter records where room_number starts with 'WYTR'
@@ -94,7 +95,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+#the route itself
 @app.route("/update-room/<room_number>", methods=["POST"])
 def update_room(room_number=None):
     room = RoomData.query.filter_by(room_number=room_number).first()
@@ -121,7 +122,7 @@ def update_room(room_number=None):
         face_count = detect_people(frame)
         is_available = "Not Available" if face_count > 0 else "Available"
         
-        #updating database based off previous update and last tim eit got that same response 
+        #updating database based off previous update and last time it got that same response 
         if is_available == "Available":
             if room.available == "Not Available" and room.checkcount < 3:
                 room.checkcount += 1
@@ -147,7 +148,7 @@ def update_room(room_number=None):
             
     return jsonify({"success": False, "error_message": "Invalid file type. Please upload a PNG, JPG, or JPEG file."}), 400
 
-#ruote that renders home template
+#route that renders home template
 @app.route("/sudo")
 def sudo():
     return render_template("home.html")
